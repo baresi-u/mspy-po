@@ -308,6 +308,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn btn-sm btn-p" onclick="showAddDevice()">+ Perangkat</button>
+        <button id="btn-admin-dash" class="btn btn-sm" onclick="showAdmin()" style="display:none;background:linear-gradient(135deg,#f4a941,#e08020);border:none;color:#fff">👑 Admin</button>
         <button class="btn btn-sm" onclick="showSettings()">⚙️</button>
         <button class="btn btn-sm" onclick="doLogout()">Keluar</button>
       </div>
@@ -507,6 +508,108 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div style="text-align:center;color:var(--text3);font-size:12px;padding:1rem">Belum ada data</div>
       </div>
       <button class="btn btn-sm btn-red" onclick="trkClearHistory()" style="margin-top:8px;width:auto;font-size:11px">🗑 Hapus Riwayat</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ ADMIN PANEL -->
+<div id="screen-admin" class="screen">
+  <div class="app-wrap">
+    <div class="topbar" style="margin-bottom:1rem">
+      <button class="btn btn-sm" onclick="showDashboard()" style="width:auto">← Dashboard</button>
+      <div class="topbar-title">👑 Panel Admin</div>
+      <div style="font-size:11px;color:var(--amber);font-weight:600">ADMIN</div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div style="display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px">
+      <button id="atab-users" class="btn btn-sm btn-p" onclick="adminTab('users')" style="white-space:nowrap">👥 Pengguna</button>
+      <button id="atab-activity" class="btn btn-sm" onclick="adminTab('activity')" style="white-space:nowrap">📋 Aktivitas</button>
+      <button id="atab-blocked" class="btn btn-sm" onclick="adminTab('blocked')" style="white-space:nowrap">🚫 Blokir</button>
+      <button id="atab-stats" class="btn btn-sm" onclick="adminTab('stats')" style="white-space:nowrap">📊 Statistik</button>
+    </div>
+
+    <!-- TAB: USERS -->
+    <div id="apanel-users">
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:14px;font-weight:700">👥 Daftar Pengguna</div>
+          <button class="btn btn-sm" onclick="adminLoadUsers()">🔄 Refresh</button>
+        </div>
+        <input type="text" id="admin-search-user" placeholder="Cari email atau nama..." oninput="adminFilterUsers()" style="margin-bottom:10px;font-size:12px"/>
+        <div id="admin-users-list"><div style="text-align:center;color:var(--text3);font-size:12px;padding:1rem">Klik Refresh untuk memuat data</div></div>
+      </div>
+    </div>
+
+    <!-- TAB: ACTIVITY -->
+    <div id="apanel-activity" style="display:none">
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:14px;font-weight:700">📋 Log Aktivitas</div>
+          <button class="btn btn-sm" onclick="adminLoadActivity()">🔄 Refresh</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+          <select id="admin-act-filter" onchange="adminFilterActivity()" style="font-size:12px;flex:1">
+            <option value="all">Semua Aktivitas</option>
+            <option value="login">Login</option>
+            <option value="register">Daftar</option>
+            <option value="imei">Cari IMEI</option>
+            <option value="phone">Cari No. Telepon</option>
+          </select>
+        </div>
+        <div id="admin-activity-list"><div style="text-align:center;color:var(--text3);font-size:12px;padding:1rem">Klik Refresh untuk memuat data</div></div>
+      </div>
+    </div>
+
+    <!-- TAB: BLOCKED -->
+    <div id="apanel-blocked" style="display:none">
+      <div class="card" style="margin-bottom:12px">
+        <div style="font-size:14px;font-weight:700;margin-bottom:10px">🚫 Kelola Nomor Diblokir</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <input type="text" id="admin-block-input" placeholder="Nomor yang diblokir (mis: 08812345678)" style="margin-bottom:0;flex:1;font-size:12px"/>
+          <button class="btn btn-sm btn-p" onclick="adminAddBlock()" style="white-space:nowrap">+ Blokir</button>
+        </div>
+        <div id="admin-blocked-list"></div>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;margin-bottom:10px">🚫 Kelola Email Diblokir</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <input type="text" id="admin-block-email-input" placeholder="Email yang diblokir" style="margin-bottom:0;flex:1;font-size:12px"/>
+          <button class="btn btn-sm btn-p" onclick="adminAddBlockEmail()" style="white-space:nowrap">+ Blokir</button>
+        </div>
+        <div id="admin-blocked-email-list"></div>
+      </div>
+    </div>
+
+    <!-- TAB: STATS -->
+    <div id="apanel-stats" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="card" style="text-align:center">
+          <div style="font-size:28px;font-weight:700;color:var(--accent)" id="stat-total-users">—</div>
+          <div style="font-size:11px;color:var(--text2)">Total Pengguna</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:28px;font-weight:700;color:var(--green)" id="stat-active-today">—</div>
+          <div style="font-size:11px;color:var(--text2)">Aktif Hari Ini</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:28px;font-weight:700;color:var(--amber)" id="stat-total-imei">—</div>
+          <div style="font-size:11px;color:var(--text2)">Pencarian IMEI</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:28px;font-weight:700;color:#a78bfa" id="stat-total-phone">—</div>
+          <div style="font-size:11px;color:var(--text2)">Pencarian Nomor</div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:12px">
+        <div style="font-size:14px;font-weight:700;margin-bottom:10px">📈 Pendaftaran per Hari</div>
+        <div id="stat-reg-chart" style="font-size:12px;color:var(--text2)">Klik Refresh di tab Pengguna untuk memuat data</div>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;margin-bottom:10px">🔍 Pencarian Terpopuler</div>
+        <div id="stat-popular" style="font-size:12px;color:var(--text2)">Memuat...</div>
+      </div>
     </div>
 
   </div>
@@ -2660,29 +2763,34 @@ async function searchPhone(){
   let pct=0;
   const timer=setInterval(()=>{pct=Math.min(pct+12,88);progressEl.style.width=pct+'%';},600);
 
-  let result, isSimulation=false;
+  // Reset cache AI agar setiap pencarian selalu segar
+  Object.keys(_aiCache).forEach(k=>{ if(k.includes(rawPhone.replace(/\D/g,''))) delete _aiCache[k]; });
 
-  // Cek cache localStorage — hasil tidak berubah untuk nomor sama
-  // Cache phone hanya di memory (bukan localStorage) agar tidak stuck di hasil lama
+  // Selalu ambil data lokal dulu — koordinat dari database prefix PASTI akurat
+  const simResult = simPhone(rawPhone);
 
   try{
-    // Selalu pakai AI dulu untuk semua nomor — akurat, biarkan 5-10 detik
-    result=await agentPhone(phone);
-    isSimulation=false;
+    // AI untuk info tambahan (operator resmi, tipe saluran, notes)
+    // tapi koordinat & kota WAJIB dari database lokal
+    const aiResult = await agentPhone(phone);
+    isSimulation = false;
 
-    // Jika koordinat tidak valid, ambil dari database lokal
-    if(!result.lat||!result.lng||result.lat===0||result.lng===0){
-      const sim=simPhone(rawPhone);
-      result.lat=sim.lat||result.lat;
-      result.lng=sim.lng||result.lng;
-      result.city=result.city||sim.city;
-      result.region=result.region||sim.region;
-    }
-
-    // Cache hanya di memory (_aiCache) — tidak di localStorage
+    // Gabungkan: koordinat dari lokal (pasti benar), info dari AI
+    result = {
+      ...aiResult,
+      // Override koordinat & lokasi dengan data lokal yang sudah terverifikasi
+      lat: simResult.lat,
+      lng: simResult.lng,
+      city: simResult.city,
+      region: simResult.region,
+      carrier: aiResult.carrier || simResult.carrier,
+      countryFlag: aiResult.countryFlag || simResult.countryFlag,
+      countryName: aiResult.countryName || simResult.countryName,
+    };
   }catch(agentErr){
-    result=simPhone(rawPhone);
-    isSimulation=result._sim||false;
+    // Fallback penuh ke database lokal
+    result = simPhone(rawPhone);
+    isSimulation = result._sim || false;
   }
   clearInterval(timer);clearInterval(textTimer);
   progressEl.style.width='100%';
@@ -3705,6 +3813,290 @@ function trkClearHistory(){
   if(!confirm('Hapus semua riwayat lokasi target?')) return;
   localStorage.removeItem(TRK_HIST_KEY);
   trkRenderHistory([]);
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// ADMIN PANEL
+// ══════════════════════════════════════════════════════════════════════
+
+let _adminUsers=[], _adminActivity=[], _adminBlockedNums=[], _adminBlockedEmails=[];
+
+function showAdmin(){
+  if(!isAdmin()){ alert('⛔ Akses ditolak.'); return; }
+  show('screen-admin');
+  adminTab('users');
+  adminLoadUsers();
+  adminLoadStats();
+  adminRenderBlocked();
+}
+
+function adminTab(tab){
+  ['users','activity','blocked','stats'].forEach(t=>{
+    document.getElementById('apanel-'+t).style.display=t===tab?'block':'none';
+    const btn=document.getElementById('atab-'+t);
+    if(btn){ btn.className='btn btn-sm'+(t===tab?' btn-p':''); }
+  });
+}
+
+// ── Load semua users dari Firestore ──────────────────────────────────
+async function adminLoadUsers(){
+  const el=document.getElementById('admin-users-list');
+  el.innerHTML='<div style="text-align:center;color:var(--text2);font-size:12px;padding:1rem">⏳ Memuat data pengguna...</div>';
+  try{
+    const snap=await fbDb.collection('users').orderBy('createdAt','desc').get();
+    _adminUsers=[];
+    snap.forEach(doc=>_adminUsers.push({id:doc.id,...doc.data()}));
+    adminRenderUsers(_adminUsers);
+    adminUpdateStats();
+  }catch(e){
+    el.innerHTML='<div style="color:var(--red);font-size:12px;padding:8px">❌ Gagal memuat: '+e.message+'</div>';
+  }
+}
+
+function adminRenderUsers(users){
+  const el=document.getElementById('admin-users-list');
+  if(!users.length){ el.innerHTML='<div style="text-align:center;color:var(--text3);font-size:12px;padding:1rem">Belum ada pengguna</div>'; return; }
+  el.innerHTML=users.map((u,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:12px">
+      <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#9b72f4);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0">${(u.name||u.email||'?')[0].toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;color:var(--text)">${u.name||'—'}</div>
+        <div style="color:var(--text2);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email||u.id}</div>
+        <div style="color:var(--text3);font-size:10px">${u.createdAt?new Date(u.createdAt).toLocaleDateString('id-ID'):'-'} · ${(u.devices||[]).length} perangkat</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+        <button class="btn btn-sm" onclick="adminViewUser('${u.id}')" style="font-size:10px;padding:3px 8px">Detail</button>
+        ${u.email!==ADMIN_EMAIL?`<button class="btn btn-sm btn-red" onclick="adminDeleteUser('${u.id}','${u.email||u.id}')" style="font-size:10px;padding:3px 8px">Hapus</button>`:'<span style="font-size:10px;color:var(--amber);text-align:center">Admin</span>'}
+      </div>
+    </div>`).join('');
+}
+
+function adminFilterUsers(){
+  const q=document.getElementById('admin-search-user').value.toLowerCase();
+  const filtered=_adminUsers.filter(u=>(u.name||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q));
+  adminRenderUsers(filtered);
+}
+
+async function adminViewUser(uid){
+  const u=_adminUsers.find(x=>x.id===uid);
+  if(!u) return;
+  const msg=`👤 Detail Pengguna\n\nNama: ${u.name||'—'}\nEmail: ${u.email||uid}\nDaftar: ${u.createdAt?new Date(u.createdAt).toLocaleString('id-ID'):'—'}\nPerangkat: ${(u.devices||[]).length}\nIMEI History: ${(u.imeiHistory||[]).length} pencarian\nPhone History: ${(u.phoneHistory||[]).length} pencarian`;
+  alert(msg);
+}
+
+async function adminDeleteUser(uid, email){
+  if(!confirm(`Hapus akun ${email}?\n\nSemua data pengguna ini akan dihapus permanen.`)) return;
+  try{
+    await fbDb.collection('users').doc(uid).delete();
+    _adminUsers=_adminUsers.filter(u=>u.id!==uid);
+    adminRenderUsers(_adminUsers);
+    adminUpdateStats();
+    // Log aktivitas
+    adminLogActivity('admin_delete',{target:email,by:state.user.email});
+    alert('✅ Akun '+email+' berhasil dihapus.');
+  }catch(e){ alert('❌ Gagal hapus: '+e.message); }
+}
+
+// ── Load aktivitas ────────────────────────────────────────────────────
+async function adminLoadActivity(){
+  const el=document.getElementById('admin-activity-list');
+  el.innerHTML='<div style="text-align:center;color:var(--text2);font-size:12px;padding:1rem">⏳ Memuat aktivitas...</div>';
+  try{
+    const snap=await fbDb.collection('activity_log').orderBy('time','desc').limit(100).get();
+    _adminActivity=[];
+    snap.forEach(doc=>_adminActivity.push({id:doc.id,...doc.data()}));
+    adminRenderActivity(_adminActivity);
+  }catch(e){
+    // Jika collection belum ada, ambil dari data user
+    _adminActivity=[];
+    _adminUsers.forEach(u=>{
+      (u.imeiHistory||[]).forEach(h=>_adminActivity.push({type:'imei',email:u.email,data:h.imei,time:new Date(h.time||Date.now()).getTime()}));
+      (u.phoneHistory||[]).forEach(h=>_adminActivity.push({type:'phone',email:u.email,data:h.phone,time:new Date(h.time||Date.now()).getTime()}));
+    });
+    _adminActivity.sort((a,b)=>b.time-a.time);
+    adminRenderActivity(_adminActivity);
+  }
+}
+
+function adminRenderActivity(acts){
+  const el=document.getElementById('admin-activity-list');
+  if(!acts.length){ el.innerHTML='<div style="text-align:center;color:var(--text3);font-size:12px;padding:1rem">Belum ada aktivitas</div>'; return; }
+  const icons={login:'🔑',register:'✅',imei:'🔍',phone:'📞',admin_delete:'🗑',block:'🚫'};
+  el.innerHTML=acts.slice(0,50).map(a=>`
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px">
+      <div style="font-size:16px;flex-shrink:0">${icons[a.type]||'📝'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;color:var(--text)">${a.type?.toUpperCase()||'—'} <span style="font-weight:400;color:var(--text2)">${a.email||'—'}</span></div>
+        <div style="color:var(--text2);font-size:11px">${a.data||''}</div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);white-space:nowrap;flex-shrink:0">${a.time?new Date(a.time).toLocaleString('id-ID',{dateStyle:'short',timeStyle:'short'}):'—'}</div>
+    </div>`).join('');
+}
+
+function adminFilterActivity(){
+  const filter=document.getElementById('admin-act-filter').value;
+  const filtered=filter==='all'?_adminActivity:_adminActivity.filter(a=>a.type===filter);
+  adminRenderActivity(filtered);
+}
+
+async function adminLogActivity(type, data){
+  try{
+    await fbDb.collection('activity_log').add({type,time:Date.now(),...data});
+  }catch(e){}
+}
+
+// ── Kelola nomor & email diblokir (simpan di Firestore) ───────────────
+async function adminLoadBlocked(){
+  try{
+    const doc=await fbDb.collection('admin').doc('blocked').get();
+    if(doc.exists){
+      const d=doc.data();
+      _adminBlockedNums=d.numbers||[];
+      _adminBlockedEmails=d.emails||[];
+    }
+  }catch(e){}
+}
+
+async function adminSaveBlocked(){
+  try{
+    await fbDb.collection('admin').doc('blocked').set({
+      numbers:_adminBlockedNums,
+      emails:_adminBlockedEmails,
+      updatedAt:Date.now()
+    });
+  }catch(e){ alert('❌ Gagal simpan: '+e.message); }
+}
+
+async function adminAddBlock(){
+  const inp=document.getElementById('admin-block-input');
+  const num=inp.value.trim().replace(/\D/g,'');
+  if(!num){ alert('Masukkan nomor yang valid.'); return; }
+  if(_adminBlockedNums.includes(num)){ alert('Nomor sudah diblokir.'); return; }
+  _adminBlockedNums.push(num);
+  await adminSaveBlocked();
+  inp.value='';
+  adminRenderBlocked();
+  alert('✅ Nomor '+num+' berhasil diblokir.');
+}
+
+async function adminRemoveBlock(num){
+  _adminBlockedNums=_adminBlockedNums.filter(n=>n!==num);
+  await adminSaveBlocked();
+  adminRenderBlocked();
+}
+
+async function adminAddBlockEmail(){
+  const inp=document.getElementById('admin-block-email-input');
+  const email=inp.value.trim().toLowerCase();
+  if(!email||!email.includes('@')){ alert('Masukkan email yang valid.'); return; }
+  if(_adminBlockedEmails.includes(email)){ alert('Email sudah diblokir.'); return; }
+  _adminBlockedEmails.push(email);
+  await adminSaveBlocked();
+  inp.value='';
+  adminRenderBlocked();
+  alert('✅ Email '+email+' berhasil diblokir.');
+}
+
+async function adminRemoveBlockEmail(email){
+  _adminBlockedEmails=_adminBlockedEmails.filter(e=>e!==email);
+  await adminSaveBlocked();
+  adminRenderBlocked();
+}
+
+function adminRenderBlocked(){
+  const numEl=document.getElementById('admin-blocked-list');
+  const emailEl=document.getElementById('admin-blocked-email-list');
+  if(numEl){
+    if(!_adminBlockedNums.length){ numEl.innerHTML='<div style="font-size:12px;color:var(--text3);text-align:center;padding:8px">Belum ada nomor yang diblokir</div>'; }
+    else numEl.innerHTML=_adminBlockedNums.map(n=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(244,92,92,.08);border-radius:8px;margin-bottom:6px;font-size:12px">
+        <span class="mono" style="color:var(--red)">🚫 0${n.startsWith('62')?n.slice(2):n.startsWith('0')?n.slice(1):n}</span>
+        <button class="btn btn-sm btn-red" onclick="adminRemoveBlock('${n}')" style="font-size:10px;padding:2px 8px">Hapus</button>
+      </div>`).join('');
+  }
+  if(emailEl){
+    if(!_adminBlockedEmails.length){ emailEl.innerHTML='<div style="font-size:12px;color:var(--text3);text-align:center;padding:8px">Belum ada email yang diblokir</div>'; }
+    else emailEl.innerHTML=_adminBlockedEmails.map(e=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(244,92,92,.08);border-radius:8px;margin-bottom:6px;font-size:12px">
+        <span style="color:var(--red)">🚫 ${e}</span>
+        <button class="btn btn-sm btn-red" onclick="adminRemoveBlockEmail('${e}')" style="font-size:10px;padding:2px 8px">Hapus</button>
+      </div>`).join('');
+  }
+}
+
+// ── Statistik ─────────────────────────────────────────────────────────
+function adminUpdateStats(){
+  const today=new Date().toLocaleDateString('id-ID');
+  document.getElementById('stat-total-users').textContent=_adminUsers.length;
+  const activeToday=_adminUsers.filter(u=>{
+    const last=u.lastLogin?new Date(u.lastLogin).toLocaleDateString('id-ID'):'';
+    return last===today;
+  }).length;
+  document.getElementById('stat-active-today').textContent=activeToday;
+  const totalImei=_adminUsers.reduce((s,u)=>s+(u.imeiHistory||[]).length,0);
+  const totalPhone=_adminUsers.reduce((s,u)=>s+(u.phoneHistory||[]).length,0);
+  document.getElementById('stat-total-imei').textContent=totalImei;
+  document.getElementById('stat-total-phone').textContent=totalPhone;
+  // Chart pendaftaran
+  const regByDay={};
+  _adminUsers.forEach(u=>{
+    if(u.createdAt){
+      const d=new Date(u.createdAt).toLocaleDateString('id-ID');
+      regByDay[d]=(regByDay[d]||0)+1;
+    }
+  });
+  const days=Object.entries(regByDay).slice(-7);
+  const maxVal=Math.max(...days.map(d=>d[1]),1);
+  document.getElementById('stat-reg-chart').innerHTML=days.length?days.map(([d,v])=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <div style="font-size:11px;color:var(--text2);width:80px;flex-shrink:0">${d}</div>
+      <div style="flex:1;background:var(--bg3);border-radius:4px;height:16px;overflow:hidden">
+        <div style="height:100%;width:${Math.round(v/maxVal*100)}%;background:linear-gradient(90deg,var(--accent),#9b72f4);border-radius:4px;transition:width .5s"></div>
+      </div>
+      <div style="font-size:11px;color:var(--text);width:20px;text-align:right">${v}</div>
+    </div>`).join(''):'<div style="font-size:12px;color:var(--text3)">Belum ada data</div>';
+  // Popular searches
+  const imeiMap={}, phoneMap={};
+  _adminUsers.forEach(u=>{
+    (u.imeiHistory||[]).forEach(h=>{ if(h.imei) imeiMap[h.imei]=(imeiMap[h.imei]||0)+1; });
+    (u.phoneHistory||[]).forEach(h=>{ if(h.phone) phoneMap[h.phone]=(phoneMap[h.phone]||0)+1; });
+  });
+  const topImei=Object.entries(imeiMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const topPhone=Object.entries(phoneMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  document.getElementById('stat-popular').innerHTML=`
+    <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">🔍 IMEI Terbanyak Dicari:</div>
+    ${topImei.length?topImei.map(([k,v])=>`<div style="font-size:12px;padding:4px 0;color:var(--text)"><span class="mono">${k}</span> <span style="color:var(--text2)">(${v}x)</span></div>`).join(''):'<div style="font-size:12px;color:var(--text3)">—</div>'}
+    <div style="font-size:12px;font-weight:600;color:var(--text2);margin-top:10px;margin-bottom:6px">📞 Nomor Terbanyak Dicari:</div>
+    ${topPhone.length?topPhone.map(([k,v])=>`<div style="font-size:12px;padding:4px 0;color:var(--text)"><span class="mono">${k}</span> <span style="color:var(--text2)">(${v}x)</span></div>`).join(''):'<div style="font-size:12px;color:var(--text3)">—</div>'}`;
+}
+
+function adminLoadStats(){
+  if(_adminUsers.length) adminUpdateStats();
+  else adminLoadUsers().then(()=>adminUpdateStats());
+}
+
+// Hook showDashboard untuk tampil tombol admin + load blocked list
+const _origShowDashboard=showDashboard;
+function showDashboard(){
+  _origShowDashboard();
+  const adminBtn=document.getElementById('btn-admin-dash');
+  if(adminBtn) adminBtn.style.display=isAdmin()?'inline-flex':'none';
+  // Load blocked numbers dari Firestore jika admin
+  if(isAdmin()) adminLoadBlocked();
+}
+
+// Override isBlockedNumber untuk cek dari Firestore juga
+const _origIsBlockedNumber=isBlockedNumber;
+function isBlockedNumber(phone){
+  if(_origIsBlockedNumber(phone)) return true;
+  const digits=phone.replace(/\D/g,'');
+  let local=digits;
+  if(digits.startsWith('62')) local='0'+digits.slice(2);
+  return _adminBlockedNums.some(b=>{
+    const bd=b.replace(/\D/g,'');
+    let bl=bd.startsWith('62')?'0'+bd.slice(2):bd.startsWith('0')?bd:'0'+bd;
+    return local===bl;
+  });
 }
 </script>
 
